@@ -1,25 +1,44 @@
 "use client";
 
 import { useState } from "react";
+import { uploadService } from "@/services/uploadService";
 
 export default function UploadAdvanced() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-  const api = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [uploadedFileUrl, setUploadedFileUrl] = useState<string | null>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    
     setFileName(file.name);
+    setError(null);
+    setUploadSuccess(false);
+    setUploadedFileUrl(null);
+  }
+
+  async function handleUpload() {
+    if (!fileName) return;
+
+    const input = document.getElementById("file-input") as HTMLInputElement;
+    const file = input?.files?.[0];
+    if (!file) return;
 
     setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
+    setError(null);
 
     try {
-      await fetch(`${api}/upload`, { method: "POST", body: fd });
-    } catch (err) {
-      console.error("upload error", err);
+      const result = await uploadService.uploadOwlFile(file);
+      setUploadSuccess(true);
+      setUploadedFileUrl(result.url);
+      console.log("Archivo subido exitosamente:", result);
+    } catch (err: any) {
+      console.error("Error al subir archivo:", err);
+      setError(err.response?.data?.message || "Error al subir el archivo. Intenta de nuevo.");
+      setUploadSuccess(false);
     } finally {
       setUploading(false);
     }
@@ -48,7 +67,7 @@ export default function UploadAdvanced() {
           </span>
 
           <span className="mt-2 text-sm text-gray-400">
-            {fileName || "Formatos permitidos: .owl, .rdf — máximo 50MB"}
+            {fileName || "Formatos permitidos: .owl, .rdf, .ttl, .n3 — máximo 50MB"}
           </span>
         </label>
 
@@ -56,25 +75,47 @@ export default function UploadAdvanced() {
         <input
           id="file-input"
           type="file"
-          accept=".owl,.rdf"
+          accept=".owl,.rdf,.ttl,.n3"
           onChange={handleFile}
           className="hidden"
         />
 
+        {/* Mensajes de estado */}
+        {error && (
+          <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-300 text-sm">
+            ❌ {error}
+          </div>
+        )}
+
+        {uploadSuccess && uploadedFileUrl && (
+          <div className="mt-4 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-300 text-sm">
+            Archivo subido exitosamente a Cloudinary
+            <a 
+              href={uploadedFileUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="block mt-2 text-purple-400 hover:text-purple-300 underline"
+            >
+              Ver archivo →
+            </a>
+          </div>
+        )}
+
         {/* Botón */}
         <div className="mt-6 flex justify-end">
           <button
+            onClick={handleUpload}
             className="rounded-lg px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold shadow-md hover:shadow-purple-500/40 transition disabled:opacity-60 disabled:cursor-not-allowed"
-            disabled={uploading}
+            disabled={uploading || !fileName}
           >
             {uploading ? "Subiendo..." : "Subir"}
           </button>
         </div>
 
         {/* Nombre del archivo abajo */}
-        {fileName && (
+        {fileName && !uploadSuccess && (
           <p className="mt-4 text-sm text-purple-300">
-            Archivo cargado: <span className="font-semibold text-white">{fileName}</span>
+            Archivo seleccionado: <span className="font-semibold text-white">{fileName}</span>
           </p>
         )}
       </div>
