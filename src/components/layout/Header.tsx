@@ -8,7 +8,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  // 🔥 Detectar si NO estamos en la página principal
+  // Detectar si NO estamos en la página principal
   const isHome = pathname === "/";
 
   return (
@@ -23,10 +23,10 @@ export default function Header() {
             </div>
             <div className="flex flex-col gap-0.5">
               <h1 className="text-xl font-black bg-gradient-to-r from-indigo-300 to-purple-300 bg-clip-text text-transparent">
-                SemanticSeries
+                SeriesTelevisivas
               </h1>
               <p className="text-xs font-semibold text-indigo-300/70 tracking-widest uppercase">
-                Búsqueda Semántica OWL
+                Búscador Semántica OWL
               </p>
             </div>
           </div>
@@ -62,12 +62,14 @@ export default function Header() {
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 group-hover:w-full transition-all duration-300"></span>
           </Link>
 
-          {/* Documentación */}
+          {/* Documentación 
           <Link href="/documentacion">
             <button className="ml-4 px-6 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold hover:from-indigo-500 hover:to-purple-500 transition-all duration-200 shadow-lg hover:shadow-indigo-500/50">
               Documentación
             </button>
           </Link>
+          */}
+          
         </nav>
 
         {/* BOTÓN MENU MÓVIL */}

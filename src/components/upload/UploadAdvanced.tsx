@@ -12,14 +12,12 @@ export default function UploadAdvanced() {
     if (!file) return;
     setFileName(file.name);
 
-    // Subida solo cuando el usuario confirme -> aquí subimos automáticamente para demo
     setUploading(true);
     const fd = new FormData();
     fd.append("file", file);
 
     try {
       await fetch(`${api}/upload`, { method: "POST", body: fd });
-      // podrías mostrar respuesta del backend
     } catch (err) {
       console.error("upload error", err);
     } finally {
@@ -28,18 +26,58 @@ export default function UploadAdvanced() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <label className="block text-left mb-2 font-medium">Archivo OWL</label>
-      <div className="flex gap-4 items-center">
-        <input type="file" accept=".owl" onChange={handleFile} />
-        <button
-          className="rounded-md px-4 py-2 bg-indigo-600 text-white disabled:opacity-60"
-          disabled={uploading}
+    <div className="w-full max-w-3xl mx-auto">
+
+      {/* Título */}
+      <label className="block text-left mb-3 text-lg font-semibold text-purple-300">
+        Subir archivo OWL
+      </label>
+
+      {/* Card principal */}
+      <div className="bg-slate-900/40 border border-purple-500/30 rounded-2xl p-6 backdrop-blur-md shadow-xl">
+
+        {/* Input visual premium */}
+        <label
+          htmlFor="file-input"
+          className="cursor-pointer flex flex-col items-center justify-center w-full border-2 border-dashed border-purple-400/40 hover:border-purple-400/80 transition-all rounded-xl py-10 px-4 bg-slate-800/40 hover:bg-slate-800/60"
         >
-          {uploading ? "Subiendo..." : "Subir"}
-        </button>
+          <span className="text-4xl mb-3">📁</span>
+
+          <span className="text-base text-purple-200 font-medium">
+            {fileName ? "Archivo seleccionado:" : "Seleccionar archivo OWL"}
+          </span>
+
+          <span className="mt-2 text-sm text-gray-400">
+            {fileName || "Formatos permitidos: .owl, .rdf — máximo 50MB"}
+          </span>
+        </label>
+
+        {/* Input oculto */}
+        <input
+          id="file-input"
+          type="file"
+          accept=".owl,.rdf"
+          onChange={handleFile}
+          className="hidden"
+        />
+
+        {/* Botón */}
+        <div className="mt-6 flex justify-end">
+          <button
+            className="rounded-lg px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-semibold shadow-md hover:shadow-purple-500/40 transition disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={uploading}
+          >
+            {uploading ? "Subiendo..." : "Subir"}
+          </button>
+        </div>
+
+        {/* Nombre del archivo abajo */}
+        {fileName && (
+          <p className="mt-4 text-sm text-purple-300">
+            Archivo cargado: <span className="font-semibold text-white">{fileName}</span>
+          </p>
+        )}
       </div>
-      {fileName && <p className="mt-3 text-sm text-gray-600">Archivo: {fileName}</p>}
     </div>
   );
 }
